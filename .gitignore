@@ -1,0 +1,30 @@
+#java specific
+*.class
+
+#netbeans ignore personal stuff
+nbproject/
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+## Algunas clases que no utilizare
+/src/swingdemo/model/Category.java
+/src/swingdemo/model/Item.java
+/src/swingdemo/model/Node.java
+/src/swingdemo/framework/AbstractController.java
+/src/swingdemo/framework/DataAccessAction.java
+/src/swingdemo/framework/DefaultAction.java
+/src/swingdemo/framework/DefaultEvent.java
+/src/swingdemo/framework/DefaultEventListener.java
+/src/swingdemo/framework/EditNewDialogController.java
+/src/swingdemo/framework/PersistenceController.java
+/src/swingdemo/ui/catalog/

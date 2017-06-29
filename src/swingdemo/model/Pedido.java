@@ -63,7 +63,7 @@ public class Pedido implements Serializable {
         this.nombre = nombre;
     }
 
-    @OneToMany
+    @OneToMany (mappedBy="pedido")
     public Set<ProductoPedido> getProductoPedidos() {
         return productoPedidos;
     }

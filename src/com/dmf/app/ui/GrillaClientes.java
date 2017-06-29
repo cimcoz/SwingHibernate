@@ -4,6 +4,7 @@
  */
 package com.dmf.app.ui;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.ListSelectionEvent;
@@ -36,6 +37,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     Pedido selectedPedido;
     
     Session session;
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    
     public GrillaClientes() {
         initComponents();
         //Iniciar Sesion;
@@ -102,6 +105,12 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaProductoPedido = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        lbltotalIva = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        lblSubTotal = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        lblTotal = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -175,15 +184,51 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         ));
         jScrollPane3.setViewportView(tablaProductoPedido);
 
+        jLabel1.setText("Total IVA [1]:");
+
+        lbltotalIva.setText("0");
+
+        jLabel2.setText("Sub Total[2]:");
+
+        lblSubTotal.setText("0");
+
+        jLabel3.setText("Total[3]:");
+
+        lblTotal.setText("0");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(lbltotalIva)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(lblSubTotal)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addGap(18, 18, 18)
+                .addComponent(lblTotal)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(lbltotalIva)
+                    .addComponent(jLabel2)
+                    .addComponent(lblSubTotal)
+                    .addComponent(jLabel3)
+                    .addComponent(lblTotal))
+                .addContainerGap())
         );
 
         tab.addTab("tab3", jPanel3);
@@ -254,12 +299,18 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lblSubTotal;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JLabel lbltotalIva;
     private javax.swing.JTabbedPane tab;
     private javax.swing.JTable tablaClientes;
     private javax.swing.JTable tablaPedidos;
@@ -286,6 +337,18 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
             selectedPedido = pedidosTableModel.getItem(tablaPedidos.getSelectedRow());
             productoPedidosTableModel.setRows(selectedPedido.getProductoPedidos());
             productoPedidosTableModel.fireTableDataChanged();
+            
+            Double totalIva = 0.0;
+            Double subTotal = 0.0;
+            for(ProductoPedido pp : selectedPedido.getProductoPedidos()) {
+                totalIva += pp.getSubTotalIva();
+                subTotal += pp.getSubTotal();
+            }
+            
+            
+            lbltotalIva.setText(formatter.format(totalIva));
+            lblSubTotal.setText(formatter.format(subTotal));
+            lblTotal.setText(formatter.format(subTotal+totalIva));
         }
     }
 }

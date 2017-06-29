@@ -60,7 +60,7 @@ public class Producto implements Serializable {
         this.precio = precio;
     }
     
-    @OneToMany(fetch= FetchType.LAZY)
+    @OneToMany(fetch= FetchType.LAZY, mappedBy="producto")
     public Set<ProductoPedido> getPedidos(){
         return this.productoPedidos;
     }

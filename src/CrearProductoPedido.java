@@ -1,7 +1,6 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.transaction.Transaction;
 import org.hibernate.Session;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;

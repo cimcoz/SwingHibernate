@@ -3,7 +3,6 @@ import java.util.Date;
 import java.util.Random;
 import org.hibernate.Session;
 import swingdemo.model.Cliente;
-import swingdemo.model.Pedido;
 import swingdemo.util.HibernateUtil;
 
 /*

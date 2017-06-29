@@ -82,6 +82,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     }
     
     private void initList() {
+        
         clientesList =  session.createCriteria(Cliente.class).list();
         pedidosList = session.createCriteria(Pedido.class).list();
     }

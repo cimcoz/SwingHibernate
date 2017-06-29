@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
-  <persistence-unit name="persistence" transaction-type="RESOURCE_LOCAL">
-    <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <class>swingdemo.model.Category</class>
-    <class>swingdemo.model.Item</class>
-    <class>swingdemo.model.Cliente</class>
-    <class>swingdemo.model.Tipo</class>
-    <class>swingdemo.model.Pedido</class>
-    <class>swingdemo.model.Producto</class>
-    <class>swingdemo.model.ProductoPedido</class>
-    <properties>
-      <property name="hibernate.connection.username" value="persistenciadb"/>
-      <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-      <property name="hibernate.connection.password" value="persistenciadb"/>
-      <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/persistenciadb"/>
-      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
-      <property name="hibernate.hbm2ddl.auto" value="update"/>
-      <property name="hibernate." value="update"/>
-      <property name="hibernate.current_session_context_class" value="managed"/>
-      <property name="hibernate.connection.autocommit" value="true"/>
-      <property name="hibernate.show_sql" value="true"/>
-      <property name="hibernate.format_sql" value="true"/>
-      <property name="hibernate.use_sql_comments" value="true"/>
-    </properties>
-  </persistence-unit>
+    <persistence-unit name="persistence" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>swingdemo.model.Category</class>
+        <class>swingdemo.model.Item</class>
+        <class>swingdemo.model.Cliente</class>
+        <class>swingdemo.model.Tipo</class>
+        <class>swingdemo.model.Pedido</class>
+        <class>swingdemo.model.Producto</class>
+        <class>swingdemo.model.ProductoPedido</class>
+        <properties>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+            <property name="hibernate.connection.username" value="persistenciadb"/>
+            <property name="hibernate.connection.password" value="persistenciadb"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/persistenciadb?zeroDateTimeBehavior=convertToNull"/>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.current_session_context_class" value="managed"/>
+            <property name="hibernate.connection.autocommit" value="true"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="SwingHibernatePU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/persistenciadb?zeroDateTimeBehavior=convertToNull"/>
+            <property name="javax.persistence.jdbc.user" value="persistenciadb"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.password" value="persistenciadb"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.current_session_context_class" value="managed"/>
+            <property name="hibernate.connection.autocommit" value="true"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+    </persistence-unit>
 </persistence>

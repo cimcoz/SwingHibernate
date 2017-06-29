@@ -65,7 +65,7 @@ public class ProductoPedido implements Serializable {
         this.id = id;
     }
 
-    @Column(name="iva")
+    @Column(name="iva", nullable=false)
     public Integer getIva() {
         return iva;
     }
@@ -74,7 +74,7 @@ public class ProductoPedido implements Serializable {
         this.iva = iva;
     }
     
-    @Column(name="nombre_producto", length=2000)
+    @Column(name="nombre_producto", length=2000, nullable=false)
     public String getNombreProducto() {
         return nombreProducto;
     }
@@ -92,7 +92,7 @@ public class ProductoPedido implements Serializable {
         this.pedido = pedido;
     }
     
-    @Column(name="precio")
+    @Column(name="precio", nullable=false)
     public Double getPrecio() {
         return precio;
     }
@@ -110,7 +110,7 @@ public class ProductoPedido implements Serializable {
         this.producto = producto;
     }
     
-    @Column(name="sub_total")
+    @Column(name="sub_total", nullable=false)
     public Double getSubTotal() {
         return subTotal;
     }
@@ -119,7 +119,7 @@ public class ProductoPedido implements Serializable {
         this.subTotal = subTotal;
     }
     
-    @Column(name="sub_total_iva")
+    @Column(name="sub_total_iva", nullable=false)
     public Double getSubTotalIva() {
         return subTotalIva;
     }

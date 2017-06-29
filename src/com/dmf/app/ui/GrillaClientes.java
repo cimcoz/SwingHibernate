@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicListUI;
 import org.hibernate.Session;
 import swingdemo.framework.EntityTableModel;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;
+import swingdemo.model.ProductoPedido;
 import swingdemo.util.HibernateUtil;
 
 /**
@@ -26,11 +26,14 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
      */
     EntityTableModel<Cliente> clienteTableModel;
     EntityTableModel<Pedido> pedidosTableModel;
+    EntityTableModel<ProductoPedido> productoPedidosTableModel;
     
     List<Cliente> clientesList;
     List<Pedido> pedidosList;
+    List<ProductoPedido> productoPedidosList;
     
     Cliente selectedCliente;
+    Pedido selectedPedido;
     
     Session session;
     public GrillaClientes() {
@@ -44,6 +47,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     private void initTable() {
         clienteTableModel = new EntityTableModel<>(Cliente.class, new ArrayList<Cliente>());
         pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList<Pedido>());
+        productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList<ProductoPedido>());
         
         clienteTableModel.addColumn("id", "id");
         clienteTableModel.addColumn("Esta Activo?", "activo");
@@ -56,12 +60,21 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         pedidosTableModel.addColumn("nombre", "nombre");
         pedidosTableModel.setRows(pedidosList);
         
+        //Agregar las columnas para Productos Pedidos
+        productoPedidosTableModel.addColumn("Producto", "nombreProducto");
+        productoPedidosTableModel.addColumn("Precio", "precio");
+        productoPedidosTableModel.addColumn("I.V.A", "iva");
+        productoPedidosTableModel.addColumn("Cantidad", "cantidad");
+        productoPedidosTableModel.addColumn("Sub Total IVA", "subTotalIva");
+        productoPedidosTableModel.addColumn("Sub Total", "subTotal");
+        
         tablaClientes.setModel(clienteTableModel);
         tablaPedidos.setModel(pedidosTableModel);
-        
+        tablaProductoPedido.setModel(productoPedidosTableModel);
         
         
         tablaClientes.getSelectionModel().addListSelectionListener(this);
+        tablaPedidos.getSelectionModel().addListSelectionListener(this);
         
     }
     
@@ -86,6 +99,9 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaPedidos = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tablaProductoPedido = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -145,6 +161,32 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         );
 
         tab.addTab("tab2", jPanel2);
+
+        tablaProductoPedido.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(tablaProductoPedido);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+        );
+
+        tab.addTab("tab3", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -214,21 +256,37 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane tab;
     private javax.swing.JTable tablaClientes;
     private javax.swing.JTable tablaPedidos;
+    private javax.swing.JTable tablaProductoPedido;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        System.out.println("cambiando lo que muestra la otra tabla"+ e.getFirstIndex());
-        selectedCliente = clienteTableModel.getItem(tablaClientes.getSelectedRow());
-        //Se debe chequear que no sea null u otras cosas
-        pedidosTableModel.setRows(selectedCliente.getPedidos());
         
-        pedidosTableModel.fireTableDataChanged();
+        System.out.println("valueChange1"+ e.getSource());
+        System.out.println("valueChange2"+ tablaClientes);
+        if (e.getSource().equals(tablaClientes.getSelectionModel()) ) {
+            System.out.println("cambiando lo que muestra la otra tabla"+ e.getFirstIndex());
+            if (tablaClientes.getSelectedRow() < 0) {return ;}
+            selectedCliente = clienteTableModel.getItem(tablaClientes.getSelectedRow());
+            //Se debe chequear que no sea null u otras cosas
+            pedidosTableModel.setRows(selectedCliente.getPedidos());
+
+            pedidosTableModel.fireTableDataChanged();
+        }
+        if (e.getSource().equals(tablaPedidos.getSelectionModel()) ) {
+            if (tablaPedidos.getSelectedRow() < 0) {return ;}
+            System.out.println("Cambio la tabla Pedidos");
+            selectedPedido = pedidosTableModel.getItem(tablaPedidos.getSelectedRow());
+            productoPedidosTableModel.setRows(selectedPedido.getProductoPedidos());
+            productoPedidosTableModel.fireTableDataChanged();
+        }
     }
 }
 

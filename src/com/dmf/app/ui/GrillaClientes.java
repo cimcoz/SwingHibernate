@@ -4,6 +4,7 @@
  */
 package com.dmf.app.ui;
 
+import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -11,9 +12,12 @@ import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.hibernate.Session;
 import swingdemo.framework.EntityTableModel;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;
@@ -37,13 +41,13 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     List<ProductoPedido> productoPedidosList;
     Cliente selectedCliente;
     Pedido selectedPedido;
-    Session session;
+    EntityManager em;
     NumberFormat formatter = NumberFormat.getCurrencyInstance();
 
     public GrillaClientes() {
         initComponents();
         //Iniciar Sesion;
-        session = HibernateUtil.getSessionFactory().openSession();
+        em = HibernateUtil.getSessionFactory().createEntityManager();
         initList();
         initTable();
     }
@@ -92,8 +96,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     }
 
     private void initList() {
-        clientesList = session.createCriteria(Cliente.class).list();
-        pedidosList = session.createCriteria(Pedido.class).list();
+        clientesList = em.createQuery("From Cliente").getResultList();
+        pedidosList = em.createQuery("From Pedido").getResultList();
     }
 
     /**
@@ -420,6 +424,13 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         if (e.getSource().equals(tablaPedidos)) {
             if (e.getKeyCode() == KeyEvent.VK_F2 ) {
                 System.out.println("Presionado f2, debo ver que fila esta seleccionada");
+                JFrame f = new JFrame("Agregar");
+               
+                JDialog dialog = new JDialog(f);
+                dialog.setContentPane(new AgregarPedidosViewPanel());
+                dialog.pack();
+                dialog.setModal(true);
+                dialog.setVisible(true);
             }
         }
     }

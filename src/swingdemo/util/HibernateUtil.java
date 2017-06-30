@@ -19,8 +19,13 @@ public class HibernateUtil {
         try {
             // Create the SessionFactory from a JPA configuration (persistence.xml)
             EntityManagerFactory emf =
-                    Persistence.createEntityManagerFactory("persistence");
-            sessionFactory = ((HibernateEntityManagerFactory)emf).getSessionFactory();
+                    Persistence.createEntityManagerFactory("SwingHibernatePU");
+            if (emf instanceof HibernateEntityManagerFactory) {
+                sessionFactory = ((HibernateEntityManagerFactory)emf).getSessionFactory();
+            }
+            else {
+                sessionFactory = (( org.hibernate.internal.SessionFactoryImpl) emf).getSessionFactory();
+            }
         } catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
             System.err.println("Initial SessionFactory creation failed." + ex);

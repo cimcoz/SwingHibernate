@@ -1,9 +1,5 @@
 
-import java.util.List;
-import java.util.Random;
 import org.hibernate.Session;
-import swingdemo.model.Cliente;
-import swingdemo.model.Pedido;
 import swingdemo.model.Producto;
 import swingdemo.util.HibernateUtil;
 

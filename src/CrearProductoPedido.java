@@ -1,7 +1,6 @@
 
-import java.util.ArrayList;
 import java.util.List;
-import org.hibernate.Session;
+import javax.persistence.EntityManager;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;
 import swingdemo.model.Producto;
@@ -27,13 +26,14 @@ public class CrearProductoPedido {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Session session = (Session) HibernateUtil.getSessionFactory().openSession();
-        Cliente c = (Cliente)session.createCriteria(Cliente.class).list().get(0);
-        List<Producto> productos = session.createCriteria(Producto.class).list();
-        List<ProductoPedido> productoPedidos = new ArrayList<>();
+        EntityManager em =  HibernateUtil.getSessionFactory().createEntityManager();
+        Cliente c = em.find(Cliente.class, 2L);
+        List<Producto> productos = em.createQuery("From Producto").getResultList();
         
         
-        org.hibernate.Transaction tx = session.beginTransaction();
+        
+        em.getTransaction().begin();
+         
         for(int i=0;i<2 ;i++) {
             Pedido p = new Pedido();
             p.setCliente(c);
@@ -58,12 +58,12 @@ public class CrearProductoPedido {
                 pp.setSubTotalIva(totalIva);
                 pp.setSubTotal(subTotal);
                 
-                session.persist(pp);
+                em.persist(pp);
             }
-            session.persist(p);
+            em.persist(p);
             
         }
-        tx.commit();
+        em.getTransaction().commit();
         
     }
 }

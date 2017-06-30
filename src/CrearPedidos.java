@@ -1,6 +1,7 @@
 
 import java.util.List;
 import java.util.Random;
+import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;
@@ -21,21 +22,22 @@ public class CrearPedidos {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Session currentSession = (Session) HibernateUtil.getSessionFactory().openSession();
+        EntityManager em =  HibernateUtil.getSessionFactory().createEntityManager();
+        
 
-        List<Cliente> clientesList = currentSession.createCriteria(Cliente.class).list();
+        List<Cliente> clientesList = em.createQuery("From Cliente").getResultList();
 
         //Crear 10 pedidos para clientes
 
-        currentSession.beginTransaction();
+        em.getTransaction().begin();
         for (Cliente c : clientesList) {
             for (int i = 0; i < 10; i++) {
                 Pedido p = new Pedido();
                 p.setCliente(c);
                 p.setNombre("Pedido: " + new Random(i).nextInt() );
-                currentSession.persist(p);
+                em.persist(p);
             }
         }
-        currentSession.getTransaction().commit();
+        em.getTransaction().commit();
     }
 }

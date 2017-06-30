@@ -1,5 +1,5 @@
 
-import org.hibernate.Session;
+import javax.persistence.EntityManager;
 import swingdemo.model.Producto;
 import swingdemo.util.HibernateUtil;
 
@@ -20,12 +20,12 @@ public class CrearProductos {
     public static void main(String[] args) {
         // TODO code application logic here
         
-        Session currentSession = (Session) HibernateUtil.getSessionFactory().openSession();
+       EntityManager em =  HibernateUtil.getSessionFactory().createEntityManager();
 
         
         //Crear 10 pedidos para clientes
 
-        currentSession.beginTransaction();
+        em.getTransaction().begin();
         
             for (int i = 0; i < 100; i++) {
                 Producto p = new Producto();
@@ -33,10 +33,10 @@ public class CrearProductos {
                 p.setDescripcion("descripcion "+i);
                 p.setPrecio(Math.random() * 100);
                 p.setIva(10);
-                currentSession.persist(p);
+                em.persist(p);
             }
         
-        currentSession.getTransaction().commit();
+        em.getTransaction().commit();
         
     }
 }

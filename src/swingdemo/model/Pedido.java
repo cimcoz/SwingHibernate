@@ -13,7 +13,7 @@ import javax.persistence.*;
  * @author marcelo
  */
 @Entity
-@Table(name="pedidos")
+@Table(name="pedido")
 public class Pedido implements Serializable {
     
     

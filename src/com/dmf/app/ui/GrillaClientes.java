@@ -4,6 +4,10 @@
  */
 package com.dmf.app.ui;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +24,7 @@ import swingdemo.util.HibernateUtil;
  *
  * @author marcelo
  */
-public class GrillaClientes extends javax.swing.JFrame implements ListSelectionListener{
+public class GrillaClientes extends javax.swing.JFrame implements ListSelectionListener, MouseListener, KeyListener {
 
     /**
      * Creates new form GrillaClientes
@@ -28,17 +32,14 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     EntityTableModel<Cliente> clienteTableModel;
     EntityTableModel<Pedido> pedidosTableModel;
     EntityTableModel<ProductoPedido> productoPedidosTableModel;
-    
     List<Cliente> clientesList;
     List<Pedido> pedidosList;
     List<ProductoPedido> productoPedidosList;
-    
     Cliente selectedCliente;
     Pedido selectedPedido;
-    
     Session session;
     NumberFormat formatter = NumberFormat.getCurrencyInstance();
-    
+
     public GrillaClientes() {
         initComponents();
         //Iniciar Sesion;
@@ -46,12 +47,12 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         initList();
         initTable();
     }
-    
+
     private void initTable() {
         clienteTableModel = new EntityTableModel<>(Cliente.class, new ArrayList<Cliente>());
         pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList<Pedido>());
         productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList<ProductoPedido>());
-        
+
         clienteTableModel.addColumn("id", "id");
         clienteTableModel.addColumn("Esta Activo?", "activo");
         clienteTableModel.addColumn("nombre", "nombre");
@@ -62,7 +63,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         pedidosTableModel.addColumn("id", "id");
         pedidosTableModel.addColumn("nombre", "nombre");
         pedidosTableModel.setRows(pedidosList);
-        
+
         //Agregar las columnas para Productos Pedidos
         productoPedidosTableModel.addColumn("Producto", "nombreProducto");
         productoPedidosTableModel.addColumn("Precio", "precio");
@@ -70,19 +71,28 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         productoPedidosTableModel.addColumn("Cantidad", "cantidad");
         productoPedidosTableModel.addColumn("Sub Total IVA", "subTotalIva");
         productoPedidosTableModel.addColumn("Sub Total", "subTotal");
-        
+
         tablaClientes.setModel(clienteTableModel);
         tablaPedidos.setModel(pedidosTableModel);
         tablaProductoPedido.setModel(productoPedidosTableModel);
+
+        //Agregando listeners
+        tablaClientes.addMouseListener(this);
+        tablaPedidos.addMouseListener(this);
+        tablaProductoPedido.addMouseListener(this);
         
-        
+        //Agregando Key Listeners
+        tablaClientes.addKeyListener(this);
+        tablaPedidos.addKeyListener(this);
+
+
         tablaClientes.getSelectionModel().addListSelectionListener(this);
         tablaPedidos.getSelectionModel().addListSelectionListener(this);
-        
+
     }
-    
+
     private void initList() {
-        clientesList =  session.createCriteria(Cliente.class).list();
+        clientesList = session.createCriteria(Cliente.class).list();
         pedidosList = session.createCriteria(Pedido.class).list();
     }
 
@@ -252,9 +262,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     private void tablaClientesPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tablaClientesPropertyChange
         // TODO add your handling code here:
         if (evt.getPropertyName().equals("selectedIndex")) {
-            
         }
-        System.out.println("Propiedad cambiada:"+ evt.getPropertyName());
+        System.out.println("Propiedad cambiada:" + evt.getPropertyName());
     }//GEN-LAST:event_tablaClientesPropertyChange
 
     /**
@@ -274,6 +283,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
                     break;
                 }
             }
@@ -319,37 +329,103 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        
-        System.out.println("valueChange1"+ e.getSource());
-        System.out.println("valueChange2"+ tablaClientes);
-        if (e.getSource().equals(tablaClientes.getSelectionModel()) ) {
-            System.out.println("cambiando lo que muestra la otra tabla"+ e.getFirstIndex());
-            if (tablaClientes.getSelectedRow() < 0) {return ;}
+
+        System.out.println("valueChange1" + e.getSource());
+        System.out.println("valueChange2" + tablaClientes);
+        if (e.getSource().equals(tablaClientes.getSelectionModel())) {
+            System.out.println("cambiando lo que muestra la otra tabla" + e.getFirstIndex());
+            if (tablaClientes.getSelectedRow() < 0) {
+                return;
+            }
             selectedCliente = clienteTableModel.getItem(tablaClientes.getSelectedRow());
             //Se debe chequear que no sea null u otras cosas
             pedidosTableModel.setRows(selectedCliente.getPedidos());
 
             pedidosTableModel.fireTableDataChanged();
         }
-        if (e.getSource().equals(tablaPedidos.getSelectionModel()) ) {
-            if (tablaPedidos.getSelectedRow() < 0) {return ;}
+        if (e.getSource().equals(tablaPedidos.getSelectionModel())) {
+            if (tablaPedidos.getSelectedRow() < 0) {
+                return;
+            }
             System.out.println("Cambio la tabla Pedidos");
             selectedPedido = pedidosTableModel.getItem(tablaPedidos.getSelectedRow());
             productoPedidosTableModel.setRows(selectedPedido.getProductoPedidos());
             productoPedidosTableModel.fireTableDataChanged();
-            
+
             Double totalIva = 0.0;
             Double subTotal = 0.0;
-            for(ProductoPedido pp : selectedPedido.getProductoPedidos()) {
+            for (ProductoPedido pp : selectedPedido.getProductoPedidos()) {
                 totalIva += pp.getSubTotalIva();
                 subTotal += pp.getSubTotal();
             }
-            
-            
+
+
             lbltotalIva.setText(formatter.format(totalIva));
             lblSubTotal.setText(formatter.format(subTotal));
-            lblTotal.setText(formatter.format(subTotal+totalIva));
+            lblTotal.setText(formatter.format(subTotal + totalIva));
         }
     }
-}
 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getSource().equals(tablaClientes)) {
+            int row = tablaClientes.rowAtPoint(e.getPoint());
+            if (e.getClickCount() == 2) {
+                // your valueChanged overridden method 
+                System.out.print("Doble Click en la tablaClientes");
+                tab.setSelectedIndex(1);
+            }
+        }
+        if (e.getSource().equals(tablaPedidos)) {
+            int row = tablaPedidos.rowAtPoint(e.getPoint());
+            if (e.getClickCount() == 2) {
+                // your valueChanged overridden method 
+                System.out.print("Doble Click en la tablaPedidos");
+                tab.setSelectedIndex(2);
+            }
+        }
+        if (e.getSource().equals(tablaProductoPedido)) {
+        }
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getSource().equals(tablaClientes)) {
+            if (e.getKeyCode() == KeyEvent.VK_F2 ) {
+                System.out.println("Presionado f2, debo ver que fila esta seleccionada");
+            }
+        }
+        if (e.getSource().equals(tablaPedidos)) {
+            if (e.getKeyCode() == KeyEvent.VK_F2 ) {
+                System.out.println("Presionado f2, debo ver que fila esta seleccionada");
+            }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        
+    }
+}

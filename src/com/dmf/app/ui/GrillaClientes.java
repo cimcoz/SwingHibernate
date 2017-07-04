@@ -4,7 +4,6 @@
  */
 package com.dmf.app.ui;
 
-import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -15,7 +14,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import swingdemo.framework.EntityTableModel;

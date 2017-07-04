@@ -102,6 +102,9 @@ public class ProductoPedido implements Serializable {
 
     public void setProducto(Producto producto) {
         this.producto = producto;
+        this.nombreProducto = producto.getNombre();
+        this.precio = producto.getPrecio();
+        this.iva = producto.getIva();
     }
     
     @Column(name="sub_total", nullable=false)
@@ -122,6 +125,14 @@ public class ProductoPedido implements Serializable {
         this.subTotalIva = subTotalIva;
     }
     
-    
+    /**
+     * Metodo para calcular los subtotales
+     */
+    public void calcularSubTotales(){
+        Double totalIva = getCantidad() * getIva() * getPrecio() / 100;
+        setSubTotalIva(totalIva);
+        Double subTotalL = getCantidad() *  getPrecio() + getSubTotalIva();
+        setSubTotal(subTotalL);
+    }
     
 }

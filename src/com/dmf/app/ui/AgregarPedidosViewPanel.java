@@ -5,12 +5,16 @@
  */
 package com.dmf.app.ui;
 
+import swingdemo.framework.TotalesTableModel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import swingdemo.framework.EntityTableModel;
 import swingdemo.model.Producto;
+import swingdemo.model.ProductoPedido;
 import swingdemo.util.HibernateUtil;
 
 /**
@@ -19,11 +23,18 @@ import swingdemo.util.HibernateUtil;
  */
 public class AgregarPedidosViewPanel extends javax.swing.JPanel implements MouseListener{
 
-    Producto selectedProduto;
-    List<Producto> productos;
     EntityManager em;
+    
+    Producto selectedProduto;
+    ProductoPedido productoPedido;
+    
+    List<Producto> productos;
+    List<ProductoPedido> productosPedidos;
 
     EntityTableModel<Producto> tableModelProducto;
+    EntityTableModel<ProductoPedido> tableModelProductoPedido;
+    TotalesTableModel totalesTableModel ;
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
 
     /**
      * Creates new form AgregarPedidosViewPanel
@@ -40,6 +51,28 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
     private void initDatos() {
         em = HibernateUtil.getSessionFactory().createEntityManager();
         productos = em.createQuery("From Producto", Producto.class).getResultList();
+        productosPedidos = new ArrayList<>();
+    }
+    
+    
+    private void updateSelectedProducto(){
+        productoNombre.setText(selectedProduto.getNombre());
+        productoIVA.setText(""+selectedProduto.getIva());
+        productoPrecio.setText(formatter.format(selectedProduto.getPrecio()));
+    }
+    
+    private void updateTotales() {
+        Double totalIva =0.0;
+        Double totalGeneral =0.0 ;
+        Number[][] rows = new Number[1][3];
+        rows[0][0] = rows[0][1] = rows[0][2] =0;
+        for (ProductoPedido proPe : productosPedidos) {
+            
+            rows[0][1] =+ proPe.getSubTotalIva();
+            rows[0][2] =+ proPe.getSubTotal();
+        }
+        totalesTableModel.setRows(rows);
+        totalesTableModel.fireTableDataChanged();
     }
     
     private void updateTable() {
@@ -61,13 +94,29 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
 
     private void initTabla() {
         tableModelProducto = new EntityTableModel(Producto.class, productos);
+        tableModelProductoPedido = new EntityTableModel(ProductoPedido.class, productosPedidos);
+        totalesTableModel = new TotalesTableModel();
 
         tableModelProducto.addColumn("nombre", "nombre");
         tableModelProducto.addColumn("descripcion", "descripcion");
         tableModelProducto.addColumn("iva", "iva");
         tableModelProducto.addColumn("precio", "precio");
+        
+        tableModelProductoPedido.addColumn("nombre", "nombreProducto");
+        tableModelProductoPedido.addColumn("cantidad", "cantidad");
+        tableModelProductoPedido.addColumn("precio", "precio");
+        tableModelProductoPedido.addColumn("iva", "iva");
+        tableModelProductoPedido.addColumn("subTotalIva", "subTotalIva");
+        tableModelProductoPedido.addColumn("subTotal", "subTotal");
+        
+        
+        tablaProductos.addMouseListener(this);
+        
+        totalesTableModel.setRows(new Number[]{15l,25,25.23});
 
         tablaProductos.setModel(tableModelProducto);
+        tablaProductosPedidos.setModel(tableModelProductoPedido);
+        tablaTotales.setModel(totalesTableModel);
 
     }
 
@@ -82,22 +131,27 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
 
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        tabPanel = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         searchText = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaProductos = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        cantidad = new javax.swing.JTextField();
+        lblProducto = new javax.swing.JLabel();
+        tvCantidad = new javax.swing.JTextField();
         btnAgregar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        tablaProductosPedidos = new javax.swing.JTable();
         jSeparator1 = new javax.swing.JSeparator();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        tablaTotales = new javax.swing.JTable();
+        lblProducto1 = new javax.swing.JLabel();
+        lblProducto2 = new javax.swing.JLabel();
+        productoNombre = new javax.swing.JLabel();
+        productoIVA = new javax.swing.JLabel();
+        productoPrecio = new javax.swing.JLabel();
+        lblProducto6 = new javax.swing.JLabel();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -141,7 +195,7 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(18, 18, 18)
@@ -156,21 +210,24 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
                     .addComponent(jLabel1)
                     .addComponent(searchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("tab1", jPanel1);
+        tabPanel.addTab("tab1", jPanel1);
 
-        jLabel2.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel2.setText("PRODUCTO");
-
-        jLabel3.setText("Cantidad");
+        lblProducto.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        lblProducto.setForeground(new java.awt.Color(0, 0, 255));
+        lblProducto.setText("PRODUCTO");
 
         btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+        tablaProductosPedidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -181,9 +238,9 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable3);
+        jScrollPane2.setViewportView(tablaProductosPedidos);
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        tablaTotales.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null}
             },
@@ -191,7 +248,31 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane4.setViewportView(jTable2);
+        jScrollPane4.setViewportView(tablaTotales);
+
+        lblProducto1.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        lblProducto1.setForeground(new java.awt.Color(0, 0, 255));
+        lblProducto1.setText("PRECIO");
+
+        lblProducto2.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        lblProducto2.setForeground(new java.awt.Color(0, 0, 255));
+        lblProducto2.setText("I.V.A");
+
+        productoNombre.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        productoNombre.setForeground(new java.awt.Color(0, 0, 255));
+        productoNombre.setText("PRODUCTO");
+
+        productoIVA.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        productoIVA.setForeground(new java.awt.Color(0, 0, 255));
+        productoIVA.setText("PRODUCTO");
+
+        productoPrecio.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        productoPrecio.setForeground(new java.awt.Color(0, 0, 255));
+        productoPrecio.setText("PRODUCTO");
+
+        lblProducto6.setFont(new java.awt.Font("Cambria", 1, 14)); // NOI18N
+        lblProducto6.setForeground(new java.awt.Color(0, 0, 255));
+        lblProducto6.setText("CANTIDAD");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -200,33 +281,57 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jSeparator1)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2)
+                            .addComponent(jSeparator1)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(18, 18, 18)
-                                .addComponent(cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnAgregar)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE))
-                .addContainerGap())
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(lblProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(productoNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(lblProducto6)
+                                        .addGap(38, 38, 38)
+                                        .addComponent(tvCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnAgregar)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblProducto2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblProducto1, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(productoIVA, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(productoPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblProducto)
+                    .addComponent(productoNombre))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblProducto2)
+                    .addComponent(productoIVA))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblProducto1)
+                    .addComponent(productoPrecio))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(cantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblProducto6)
+                    .addComponent(tvCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAgregar))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -234,19 +339,17 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("tab2", jPanel2);
+        tabPanel.addTab("tab2", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(tabPanel)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 367, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(tabPanel)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -255,13 +358,26 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
         updateTable();
     }//GEN-LAST:event_searchTextActionPerformed
 
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        // TODO add your handling code here:
+        Double cantidad = Double.parseDouble(tvCantidad.getText());
+        ProductoPedido pp = new ProductoPedido();
+        pp.setProducto(selectedProduto);
+        pp.setCantidad(cantidad);
+        pp.calcularSubTotales();
+        productosPedidos.add(pp);
+        
+        
+        tableModelProductoPedido.setRows(productosPedidos);
+        tableModelProductoPedido.fireTableDataChanged();
+        
+        updateTotales();
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
-    private javax.swing.JTextField cantidad;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -269,36 +385,48 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTable jTable3;
+    private javax.swing.JLabel lblProducto;
+    private javax.swing.JLabel lblProducto1;
+    private javax.swing.JLabel lblProducto2;
+    private javax.swing.JLabel lblProducto6;
+    private javax.swing.JLabel productoIVA;
+    private javax.swing.JLabel productoNombre;
+    private javax.swing.JLabel productoPrecio;
     private javax.swing.JTextField searchText;
+    private javax.swing.JTabbedPane tabPanel;
     private javax.swing.JTable tablaProductos;
+    private javax.swing.JTable tablaProductosPedidos;
+    private javax.swing.JTable tablaTotales;
+    private javax.swing.JTextField tvCantidad;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (e.getSource().equals(tablaProductos)) {
+            if (e.getClickCount() == 2) {
+                    int row = tablaProductos.getSelectedRow();
+                    if (row < 0 ){ return;}
+                    selectedProduto = tableModelProducto.getItem(row);
+                    updateSelectedProducto();
+                    tabPanel.setSelectedIndex(1);
+            }
+        }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+     }
 }

@@ -11,8 +11,8 @@
     <property name="hibernate.show_sql">true</property>
     <property name="hibernate.format_sql">true</property>
     <property name="hibernate.use_sql_comments">true</property>
-    <mapping class="swingdemo.model.Category" />
-    <mapping class="swingdemo.model.Item" />
+    <!--<mapping class="swingdemo.model.Category" />-->
+    <!--<mapping class="swingdemo.model.Item" />-->
     <mapping class="swingdemo.model.Cliente" />
     <mapping class="swingdemo.model.Tipo" />
     <mapping class="swingdemo.model.Pedidos" />

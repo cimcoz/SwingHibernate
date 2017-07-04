@@ -13,14 +13,14 @@ import javax.persistence.*;
  * @author marcelo
  */
 @Entity
-@Table(name="pedidos")
+@Table(name="pedido")
 public class Pedido implements Serializable {
     
     
-    private Long                id;
-    private Cliente             cliente;
-    private String              nombre;
-    private Set<Producto>       productos;
+    private Long                    id;
+    private Cliente                 cliente;
+    private String                  nombre;
+    private Set<ProductoPedido>     productoPedidos;
 
     public Pedido() {
     }
@@ -63,13 +63,13 @@ public class Pedido implements Serializable {
         this.nombre = nombre;
     }
 
-    @ManyToMany
-    public Set<Producto> getProductos() {
-        return productos;
+    @OneToMany (mappedBy="pedido")
+    public Set<ProductoPedido> getProductoPedidos() {
+        return productoPedidos;
     }
 
-    public void setProductos(Set<Producto> productos) {
-        this.productos = productos;
+    public void setProductoPedidos(Set<ProductoPedido> productoPedidos) {
+        this.productoPedidos = productoPedidos;
     }
     
     

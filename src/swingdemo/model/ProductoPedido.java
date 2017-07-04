@@ -5,13 +5,7 @@
 package swingdemo.model;
 
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  *
@@ -65,7 +59,7 @@ public class ProductoPedido implements Serializable {
         this.id = id;
     }
 
-    @Column(name="iva")
+    @Column(name="iva", nullable=false)
     public Integer getIva() {
         return iva;
     }
@@ -74,7 +68,7 @@ public class ProductoPedido implements Serializable {
         this.iva = iva;
     }
     
-    @Column(name="nombre_producto", length=2000)
+    @Column(name="nombre_producto", length=2000, nullable=false)
     public String getNombreProducto() {
         return nombreProducto;
     }
@@ -83,7 +77,7 @@ public class ProductoPedido implements Serializable {
         this.nombreProducto = nombreProducto;
     }
     
-    @OneToOne
+    @ManyToOne
     public Pedido getPedido() {
         return pedido;
     }
@@ -92,7 +86,7 @@ public class ProductoPedido implements Serializable {
         this.pedido = pedido;
     }
     
-    @Column(name="precio")
+    @Column(name="precio", nullable=false)
     public Double getPrecio() {
         return precio;
     }
@@ -101,16 +95,22 @@ public class ProductoPedido implements Serializable {
         this.precio = precio;
     }
     
-    @OneToOne
+    @ManyToOne
     public Producto getProducto() {
         return producto;
     }
 
     public void setProducto(Producto producto) {
         this.producto = producto;
+        if (producto.getNombre()  == null) {return ;}
+        this.nombreProducto = producto.getNombre();
+        if (producto.getPrecio()== null) {return ;}
+        this.precio = producto.getPrecio();
+        if (producto.getIva()== null) {return ;}
+        this.iva = producto.getIva();
     }
     
-    @Column(name="sub_total")
+    @Column(name="sub_total", nullable=false)
     public Double getSubTotal() {
         return subTotal;
     }
@@ -119,7 +119,7 @@ public class ProductoPedido implements Serializable {
         this.subTotal = subTotal;
     }
     
-    @Column(name="sub_total_iva")
+    @Column(name="sub_total_iva", nullable=false)
     public Double getSubTotalIva() {
         return subTotalIva;
     }
@@ -128,6 +128,14 @@ public class ProductoPedido implements Serializable {
         this.subTotalIva = subTotalIva;
     }
     
-    
+    /**
+     * Metodo para calcular los subtotales
+     */
+    public void calcularSubTotales(){
+        Double totalIva = getCantidad() * getIva() * getPrecio() / 100;
+        setSubTotalIva(totalIva);
+        Double subTotalL = getCantidad() *  getPrecio() + getSubTotalIva();
+        setSubTotal(subTotalL);
+    }
     
 }

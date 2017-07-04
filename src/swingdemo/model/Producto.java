@@ -15,12 +15,12 @@ import javax.persistence.*;
 @Entity
 public class Producto implements Serializable {
     
-    private Long            id;
-    private String          nombre;
-    private String          descripcion;
-    private Double          precio;
-    private Integer         iva;
-    private Set<Pedido>     pedidos;
+    private Long                    id;
+    private String                  nombre;
+    private String                  descripcion;
+    private Double                  precio;
+    private Integer                 iva;
+    private Set<ProductoPedido>     productoPedidos;
     
     
     @Column(name="descripcion")
@@ -60,25 +60,32 @@ public class Producto implements Serializable {
         this.precio = precio;
     }
     
-    @ManyToMany(mappedBy="productos", fetch= FetchType.LAZY)
-    @JoinTable(name="productos_pedidos", joinColumns = {@JoinColumn(name="pedido_id")}, inverseJoinColumns={@JoinColumn(name="producto_id")})
-    public Set<Pedido> getPedidos(){
-        return this.pedidos;
+    @OneToMany(fetch= FetchType.LAZY, mappedBy="producto")
+    public Set<ProductoPedido> getPedidos(){
+        return this.productoPedidos;
     }
 
-    public void setPedidos(Set<Pedido> pedidos) {
-        this.pedidos = pedidos;
+    public void setPedidos(Set<ProductoPedido> productoPedidos) {
+        this.productoPedidos = productoPedidos;
+    }
+
+    public Integer getIva() {
+        return iva;
+    }
+
+    public void setIva(Integer iva) {
+        this.iva = iva;
     }
     
     
     
 
-    public Producto(Long id, String nombre, String descripcion, Double precio, Set<Pedido> clientes) {
+    public Producto(Long id, String nombre, String descripcion, Double precio, Set<ProductoPedido> productoPedidos) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
-        this.pedidos = clientes;
+        this.productoPedidos = productoPedidos;
     }
 
     public Producto() {

@@ -1,9 +1,8 @@
 
 import java.util.Date;
 import java.util.Random;
-import org.hibernate.Session;
+import javax.persistence.EntityManager;
 import swingdemo.model.Cliente;
-import swingdemo.model.Pedido;
 import swingdemo.util.HibernateUtil;
 
 /*
@@ -22,16 +21,16 @@ public class CrearClientes {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Session currentSession = (Session) HibernateUtil.getSessionFactory().openSession();
-        currentSession.beginTransaction();
+        EntityManager em =  HibernateUtil.getEntityManagerFactory().createEntityManager();
+        em.getTransaction().begin();
         for (int i = 0; i < 10; i++) {
                 Cliente c = new Cliente();
                 c.setNombre("Nuevo");
                 c.setApellido("Apellido: " + new Random(i).nextInt() );
                 c.setActivo(false);
                 c.setCreatedOn(new Date());
-                currentSession.persist(c);
+                em.persist(c);
         }
-        currentSession.getTransaction().commit();
+        em.getTransaction().commit();
     }
 }

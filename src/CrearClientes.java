@@ -21,7 +21,7 @@ public class CrearClientes {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        EntityManager em =  HibernateUtil.getSessionFactory().createEntityManager();
+        EntityManager em =  HibernateUtil.getEntityManagerFactory().createEntityManager();
         em.getTransaction().begin();
         for (int i = 0; i < 10; i++) {
                 Cliente c = new Cliente();

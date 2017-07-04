@@ -27,7 +27,7 @@ public class HibernateUtil {
         }
     }
 
-    public static EntityManagerFactory getSessionFactory() {
+    public static EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
     }
 

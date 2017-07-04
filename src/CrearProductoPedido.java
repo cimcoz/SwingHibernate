@@ -26,7 +26,7 @@ public class CrearProductoPedido {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        EntityManager em =  HibernateUtil.getSessionFactory().createEntityManager();
+        EntityManager em =  HibernateUtil.getEntityManagerFactory().createEntityManager();
         Cliente c = em.find(Cliente.class, 2L);
         List<Producto> productos = em.createQuery("From Producto").getResultList();
         

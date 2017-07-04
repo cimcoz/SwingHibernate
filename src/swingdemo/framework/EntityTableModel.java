@@ -13,12 +13,12 @@ import java.lang.reflect.Method;
 public class EntityTableModel<T> extends AbstractTableModel {
 
     private Class<T> entityClass;
-    private List<PropertyDescriptor> properties = new ArrayList<PropertyDescriptor>();
+    private List<PropertyDescriptor> properties = new ArrayList<>();
     private List<T> rows;
 
     public EntityTableModel(Class<T> entityClass, Collection<T> rows) {
         this.entityClass = entityClass;
-        this.rows = new ArrayList<T>(rows);
+        this.rows = new ArrayList<>(rows);
     }
 
     public String getColumnName(int column) {
@@ -81,8 +81,11 @@ public class EntityTableModel<T> extends AbstractTableModel {
         Class t= properties.get(columnIndex).getPropertyType();
         return t;
     }
-    
-    
-    
 
+    public List<T> getRows() {
+        return rows;
+    }
+    
+    
+    
 }

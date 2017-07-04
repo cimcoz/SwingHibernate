@@ -102,8 +102,11 @@ public class ProductoPedido implements Serializable {
 
     public void setProducto(Producto producto) {
         this.producto = producto;
+        if (producto.getNombre()  == null) {return ;}
         this.nombreProducto = producto.getNombre();
+        if (producto.getPrecio()== null) {return ;}
         this.precio = producto.getPrecio();
+        if (producto.getIva()== null) {return ;}
         this.iva = producto.getIva();
     }
     

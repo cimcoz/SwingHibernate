@@ -42,21 +42,19 @@ public class CrearProductoPedido {
             for(int j = 0;j<20;j++) {
                 ProductoPedido pp = new ProductoPedido();
                 pp.setProducto(productos.get(j));
+                System.out.println(productos.get(j));
                 pp.setPedido(p);
-                
-                pp.setNombreProducto(productos.get(j).getNombre());
-                
-                pp.setIva(productos.get(j).getIva());
                 pp.setCantidad((double)j);
-                pp.setPrecio(productos.get(j).getPrecio());
+                pp.calcularSubTotales();
+               
                 
                 //Calcular totales, esto podria estar en un trigger en la base de datos
                 //El problema es que se delega la responsabilidad al dba que genere el codigo
                 //para que la app funcione correctamente
-                Double totalIva = pp.getCantidad() * productos.get(j).getIva() * productos.get(j).getPrecio() / 100;
-                Double subTotal = pp.getCantidad() *  productos.get(j).getPrecio() ;
-                pp.setSubTotalIva(totalIva);
-                pp.setSubTotal(subTotal);
+//                Double totalIva = pp.getCantidad() * productos.get(j).getIva() * productos.get(j).getPrecio() / 100;
+//                Double subTotal = pp.getCantidad() *  productos.get(j).getPrecio() ;
+//                pp.setSubTotalIva(totalIva);
+//                pp.setSubTotal(subTotal);
                 
                 em.persist(pp);
             }

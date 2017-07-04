@@ -72,6 +72,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         pedidosTableModel.setRows(pedidosList);
 
         //Agregar las columnas para Productos Pedidos
+        productoPedidosTableModel.addColumn("ID", "id");
         productoPedidosTableModel.addColumn("Producto", "nombreProducto");
         productoPedidosTableModel.addColumn("Precio", "precio");
         productoPedidosTableModel.addColumn("I.V.A", "iva");
@@ -85,8 +86,13 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
 
         //Agregando listeners
         tablaClientes.addMouseListener(this);
+        tablaClientes.setAutoCreateRowSorter(true);
+        
         tablaPedidos.addMouseListener(this);
+        tablaPedidos.setAutoCreateRowSorter(true);
+        
         tablaProductoPedido.addMouseListener(this);
+        tablaProductoPedido.setAutoCreateRowSorter(true);
         
         //Agregando Key Listeners
         tablaClientes.addKeyListener(this);

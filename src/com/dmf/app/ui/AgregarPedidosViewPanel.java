@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import swingdemo.framework.EntityTableModel;
+import swingdemo.framework.Totales;
 import swingdemo.model.Producto;
 import swingdemo.model.ProductoPedido;
 import swingdemo.util.HibernateUtil;
@@ -62,17 +63,19 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
     }
     
     private void updateTotales() {
+        Double totalItems =0.0 ;
         Double totalIva =0.0;
         Double totalGeneral =0.0 ;
-        Number[][] rows = new Number[1][3];
-        rows[0][0] = rows[0][1] = rows[0][2] =0;
+       
+        
         for (ProductoPedido proPe : productosPedidos) {
-            
-            rows[0][1] =+ proPe.getSubTotalIva();
-            rows[0][2] =+ proPe.getSubTotal();
+            totalItems += proPe.getCantidad();
+            totalIva += proPe.getSubTotalIva();
+            totalGeneral += proPe.getSubTotal();
         }
-        totalesTableModel.setRows(rows);
+        totalesTableModel.setRows(new Totales(totalItems, totalIva, totalGeneral));
         totalesTableModel.fireTableDataChanged();
+        System.out.println("com.dmf.app.ui.AgregarPedidosViewPanel.updateTotales()" + totalIva);
     }
     
     private void updateTable() {
@@ -112,7 +115,7 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
         
         tablaProductos.addMouseListener(this);
         
-        totalesTableModel.setRows(new Number[]{15l,25,25.23});
+        totalesTableModel.setRows(new Totales());
 
         tablaProductos.setModel(tableModelProducto);
         tablaProductosPedidos.setModel(tableModelProductoPedido);

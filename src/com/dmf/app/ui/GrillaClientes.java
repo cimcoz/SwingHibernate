@@ -61,8 +61,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     private void initTable() throws InstantiationException{
 //        clienteTableModel = new EntityTableModel<>(Cliente.class, new ArrayList<Cliente>());
         clienteTableModel = new ClienteTableModel(tablaClientes, Cliente.class, clientesList, tipoClientesList);
-        pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList<Pedido>());
-        productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList<ProductoPedido>());
+        pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList<>());
+        productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList<>());
 
         
         clienteTableModel.setRows(clientesList);

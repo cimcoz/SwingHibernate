@@ -38,7 +38,7 @@ public class AgregarPedidosViewPanel extends javax.swing.JPanel implements Mouse
      * Inicializar los datos
      */
     private void initDatos() {
-        em = HibernateUtil.getSessionFactory().createEntityManager();
+        em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         productos = em.createQuery("From Producto", Producto.class).getResultList();
     }
     

@@ -4,7 +4,6 @@
  */
 package com.dmf.app.ui;
 
-import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -12,16 +11,19 @@ import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import swingdemo.framework.ClienteTableModel;
 import swingdemo.framework.EntityTableModel;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;
 import swingdemo.model.ProductoPedido;
+import swingdemo.model.Tipo;
 import swingdemo.util.HibernateUtil;
 
 /**
@@ -33,35 +35,36 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     /**
      * Creates new form GrillaClientes
      */
-    EntityTableModel<Cliente> clienteTableModel;
+    ClienteTableModel clienteTableModel;
     EntityTableModel<Pedido> pedidosTableModel;
     EntityTableModel<ProductoPedido> productoPedidosTableModel;
+    
     List<Cliente> clientesList;
+    List<Tipo> tipoClientesList;
     List<Pedido> pedidosList;
     List<ProductoPedido> productoPedidosList;
+    
     Cliente selectedCliente;
     Pedido selectedPedido;
+    
     EntityManager em;
     NumberFormat formatter = NumberFormat.getCurrencyInstance();
 
-    public GrillaClientes() {
+    public GrillaClientes() throws InstantiationException {
         initComponents();
         //Iniciar Sesion;
-        em = HibernateUtil.getSessionFactory().createEntityManager();
+        em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         initList();
         initTable();
     }
 
-    private void initTable() {
-        clienteTableModel = new EntityTableModel<>(Cliente.class, new ArrayList<Cliente>());
+    private void initTable() throws InstantiationException{
+//        clienteTableModel = new EntityTableModel<>(Cliente.class, new ArrayList<Cliente>());
+        clienteTableModel = new ClienteTableModel(tablaClientes, Cliente.class, clientesList, tipoClientesList);
         pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList<Pedido>());
         productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList<ProductoPedido>());
 
-        clienteTableModel.addColumn("id", "id");
-        clienteTableModel.addColumn("Esta Activo?", "activo");
-        clienteTableModel.addColumn("nombre", "nombre");
-        clienteTableModel.addColumn("apellido", "apellido");
-        clienteTableModel.addColumn("tipo", "tipo");
+        
         clienteTableModel.setRows(clientesList);
         //Agregar columnas pedidos
         pedidosTableModel.addColumn("id", "id");
@@ -98,6 +101,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     private void initList() {
         clientesList = em.createQuery("From Cliente").getResultList();
         pedidosList = em.createQuery("From Pedido").getResultList();
+        tipoClientesList = em.createQuery("From Tipo").getResultList();
     }
 
     /**
@@ -308,7 +312,11 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new GrillaClientes().setVisible(true);
+                try {
+                    new GrillaClientes().setVisible(true);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(GrillaClientes.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -343,9 +351,14 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
             }
             selectedCliente = clienteTableModel.getItem(tablaClientes.getSelectedRow());
             //Se debe chequear que no sea null u otras cosas
-            pedidosTableModel.setRows(selectedCliente.getPedidos());
-
+            if (selectedCliente.getPedidos() != null) { 
+                pedidosTableModel.setRows(selectedCliente.getPedidos());
+            }
+            else {
+                pedidosTableModel.setRows(new ArrayList<Pedido>());
+            }
             pedidosTableModel.fireTableDataChanged();
+
         }
         if (e.getSource().equals(tablaPedidos.getSelectionModel())) {
             if (tablaPedidos.getSelectedRow() < 0) {
@@ -420,6 +433,18 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
             if (e.getKeyCode() == KeyEvent.VK_F2 ) {
                 System.out.println("Presionado f2, debo ver que fila esta seleccionada");
             }
+            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                System.out.println("Se presiono DOWN, ver el row index de la tabla");
+                System.out.println("Total"+tablaClientes.getRowCount());
+                System.out.println("Selected"+tablaClientes.getSelectedRow());
+                if (tablaClientes.getSelectedRow()  == tablaClientes.getRowCount()-1) {
+                   System.out.println("Llegue al final de la lista: crear un nuevo elemento");
+                   Cliente c = new Cliente();
+                   clienteTableModel.addRow(c);
+                   clienteTableModel.fireTableRowsInserted(tablaClientes.getSelectedRow() + 1, tablaClientes.getSelectedRow() + 1);                
+                }
+            }
+            
         }
         if (e.getSource().equals(tablaPedidos)) {
             if (e.getKeyCode() == KeyEvent.VK_F2 ) {

@@ -13,26 +13,33 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
-import org.hibernate.Session;
 import swingdemo.model.Cliente;
 import swingdemo.model.Tipo;
 
 /**
  *
  * @author marcelo
+ * Debido al hecho que esta Clase es muy especifica para el Modelo de Cliente
+ * se ha permitido pasar una lista con los elementos Clientes y Tambien Una lista 
+ * con los elementos Tipos de Clientes
  */
 public final class ClienteTableModel extends EntityTableModel<Cliente>{
     
     
     List<Tipo> tipos;
-    Session session;
     Cliente clienteSelected;
     JTable parent;
     private DefaultComboBoxModel<Tipo> comboBoxModel;
     
-    public ClienteTableModel(JTable parent, Class<Cliente> entityClass, Collection<Cliente> rows , Session session) {
+    public ClienteTableModel(JTable parent, Class<Cliente> entityClass, Collection<Cliente> rows , List<Tipo> tipos ) throws InstantiationException {
         super(Cliente.class, rows);
-        this.session = session;
+        if (tipos == null) {
+            throw new InstantiationException("La lista de tipos no puede ser null");
+        }
+        if (rows == null) {
+            throw new InstantiationException("Las filas de clientes no pueden ser nulas");
+        }
+        this.tipos = tipos;
         this.parent = parent;
         initTable();
     }
@@ -46,7 +53,6 @@ public final class ClienteTableModel extends EntityTableModel<Cliente>{
         addColumn("tipo", "tipo");
         
         parent.setModel(this);
-        tipos = session.createCriteria(Tipo.class).list();
         TableColumn columnaTipo = parent.getColumnModel().getColumn(4);
         //Convirtiendo la lista en array
         comboBoxModel = new DefaultComboBoxModel<Tipo>(tipos.toArray(new Tipo[tipos.size()]));

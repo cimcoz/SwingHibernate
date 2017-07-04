@@ -1,7 +1,5 @@
 package swingdemo.util;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.ejb.HibernateEntityManagerFactory;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -13,28 +11,24 @@ import javax.persistence.Persistence;
  */
 public class HibernateUtil {
 
-    private static final SessionFactory sessionFactory;
+    private static final EntityManagerFactory entityManagerFactory;
 
     static {
         try {
             // Create the SessionFactory from a JPA configuration (persistence.xml)
-            EntityManagerFactory emf =
+            entityManagerFactory =
                     Persistence.createEntityManagerFactory("SwingHibernatePU");
-            if (emf instanceof HibernateEntityManagerFactory) {
-                sessionFactory = ((HibernateEntityManagerFactory)emf).getSessionFactory();
-            }
-            else {
-                sessionFactory = (( org.hibernate.internal.SessionFactoryImpl) emf).getSessionFactory();
-            }
+            
+            
         } catch (Throwable ex) {
             // Make sure you log the exception, as it might be swallowed
-            System.err.println("Initial SessionFactory creation failed." + ex);
+            System.err.println("Initial EntityManagerFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
     }
 
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
+    public static EntityManagerFactory getSessionFactory() {
+        return entityManagerFactory;
     }
 
 }

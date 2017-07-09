@@ -61,8 +61,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     private void initTable() throws InstantiationException{
 //        clienteTableModel = new EntityTableModel<>(Cliente.class, new ArrayList<Cliente>());
         clienteTableModel = new ClienteTableModel(tablaClientes, Cliente.class, clientesList, tipoClientesList);
-        pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList<>());
-        productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList<>());
+        pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList());
+        productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList());
 
         
         clienteTableModel.setRows(clientesList);
@@ -348,10 +348,9 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     @Override
     public void valueChanged(ListSelectionEvent e) {
 
-        System.out.println("valueChange1" + e.getSource());
-        System.out.println("valueChange2" + tablaClientes);
+        
         if (e.getSource().equals(tablaClientes.getSelectionModel())) {
-            System.out.println("cambiando lo que muestra la otra tabla" + e.getFirstIndex());
+            System.out.println("cambiando lo que muestra la otra tabla");
             if (tablaClientes.getSelectedRow() < 0) {
                 return;
             }
@@ -436,21 +435,55 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getSource().equals(tablaClientes)) {
-            if (e.getKeyCode() == KeyEvent.VK_F2 ) {
-                System.out.println("Presionado f2, debo ver que fila esta seleccionada");
-            }
-            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                System.out.println("Se presiono DOWN, ver el row index de la tabla");
-                System.out.println("Total"+tablaClientes.getRowCount());
-                System.out.println("Selected"+tablaClientes.getSelectedRow());
-                if (tablaClientes.getSelectedRow()  == tablaClientes.getRowCount()-1) {
-                   System.out.println("Llegue al final de la lista: crear un nuevo elemento");
-                   Cliente c = new Cliente();
-                   clienteTableModel.addRow(c);
-                   clienteTableModel.fireTableRowsInserted(tablaClientes.getSelectedRow() + 1, tablaClientes.getSelectedRow() + 1);                
-                }
-            }
             
+            int row             = tablaClientes.getSelectedRow();
+            boolean inicioTabla = tablaClientes.getRowCount() == 0;
+            boolean finTabla    = tablaClientes.getRowCount()-1 == row ;
+            
+            switch(e.getKeyCode()) {
+                
+                case KeyEvent.VK_F2: 
+                    System.out.println("Presionado f2, debo ver que fila esta seleccionada");
+                    break;
+                case KeyEvent.VK_DOWN: 
+                    System.out.println("Se presiono DOWN");
+                    if (inicioTabla) {
+                        System.out.println("Agregando el primer cliente");
+                        addCliente(row);
+                    }
+                    else if (finTabla) {
+                       System.out.println("Llegue al final de la tabla");
+                       Cliente selected = clienteTableModel.getItem(row);
+                       if (!isNull(selected)) { 
+                           System.out.println("El ultimo cliente no es null, "
+                                + "crear un nuevo elemento");
+                           addCliente(row);
+                       }
+                    }
+                    break;
+                case KeyEvent.VK_UP:
+                    System.out.println("Se presiono UP, debo borrar el cliente "
+                            + "si no se guardo ningun dato");
+                    if (inicioTabla) {
+                        return ;
+                    }
+                    else if (finTabla) { 
+                        System.out.println("Estoy en el final de la tabla");
+                        Cliente selected = clienteTableModel.getItem(row);
+                        if (isNull(selected)) {
+                            clienteTableModel.removeItem(row);
+                            clienteTableModel.fireTableRowsDeleted(row, row);
+                            row = tablaClientes.getRowCount();
+                            System.out.println("filas luego de borrar: "+row);
+                            if (row > 0) {
+                                tablaClientes.setRowSelectionInterval(row-1, row-1);
+                                e.consume();
+                            }
+                        }
+                        
+                    }       
+                    break;
+            }                        
         }
         if (e.getSource().equals(tablaPedidos)) {
             if (e.getKeyCode() == KeyEvent.VK_F2 ) {
@@ -469,5 +502,24 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     @Override
     public void keyReleased(KeyEvent e) {
         
+    }
+    
+    /**
+     * Comprobar si cliente es null
+     */
+    private Boolean isNull (Cliente c){
+        return c==null || ((c.getNombre()==null || c.getNombre().isEmpty()) && 
+                (c.getApellido() == null || c.getApellido().isEmpty() ) && 
+                (c.getActivo() == null || !c.getActivo() ) && c.getTipo() == null );
+    }
+    
+    /**
+     * Agregar un cliente
+     * 
+     */
+    private void addCliente(int rowIndex) {
+            Cliente c = new Cliente();
+            clienteTableModel.addRow(c);
+            clienteTableModel.fireTableRowsInserted(rowIndex+1, rowIndex + 1);
     }
 }

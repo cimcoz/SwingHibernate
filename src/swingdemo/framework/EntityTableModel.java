@@ -9,6 +9,9 @@ import java.lang.reflect.Method;
  * A table model for Swing that works easily with rows of JavaBeans.
  *
  * @author Christian Bauer
+ * @author Marcelo Flores
+ * 
+ * Se agregaron metodos para permitir agregar o eliminar items de la lista
  */
 public class EntityTableModel<T> extends AbstractTableModel {
 
@@ -72,7 +75,12 @@ public class EntityTableModel<T> extends AbstractTableModel {
         this.rows = new ArrayList<T>(rows);
     }
     
-    public T getItem(int rowIndex) {
+    /**
+     * 
+     * @param rowIndex
+     * @return 
+     */
+    public T getItem(int rowIndex) throws IndexOutOfBoundsException{
         return rows.get(rowIndex);
     }
 
@@ -84,6 +92,11 @@ public class EntityTableModel<T> extends AbstractTableModel {
 
     public List<T> getRows() {
         return rows;
+    }
+    
+    //Remueve un elemento
+    public T removeItem(int rowIndex){
+        return rows.remove(rowIndex);
     }
     
     

@@ -20,6 +20,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import swingdemo.framework.ClienteTableModel;
 import swingdemo.framework.EntityTableModel;
+import swingdemo.framework.Totales;
+import swingdemo.framework.TotalesTableModel;
 import swingdemo.model.Cliente;
 import swingdemo.model.Pedido;
 import swingdemo.model.ProductoPedido;
@@ -49,6 +51,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
     
     EntityManager em;
     NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    private TotalesTableModel totalesTableModel;
 
     public GrillaClientes() throws InstantiationException {
         initComponents();
@@ -63,6 +66,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         clienteTableModel = new ClienteTableModel(tablaClientes, Cliente.class, clientesList, tipoClientesList);
         pedidosTableModel = new EntityTableModel<>(Pedido.class, new ArrayList());
         productoPedidosTableModel = new EntityTableModel<>(ProductoPedido.class, new ArrayList());
+        totalesTableModel = new TotalesTableModel();
+        totalesTableModel.setRows(new Totales());
 
         
         clienteTableModel.setRows(clientesList);
@@ -83,6 +88,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         tablaClientes.setModel(clienteTableModel);
         tablaPedidos.setModel(pedidosTableModel);
         tablaProductoPedido.setModel(productoPedidosTableModel);
+        tablaTotales.setModel(totalesTableModel);
 
         //Agregando listeners
         tablaClientes.addMouseListener(this);
@@ -129,12 +135,8 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaProductoPedido = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
-        lbltotalIva = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        lblSubTotal = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        lblTotal = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tablaTotales = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -160,7 +162,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -186,7 +188,7 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,50 +210,32 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         ));
         jScrollPane3.setViewportView(tablaProductoPedido);
 
-        jLabel1.setText("Total IVA [1]:");
-
-        lbltotalIva.setText("0");
-
-        jLabel2.setText("Sub Total[2]:");
-
-        lblSubTotal.setText("0");
-
-        jLabel3.setText("Total[3]:");
-
-        lblTotal.setText("0");
+        tablaTotales.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(tablaTotales);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(lbltotalIva)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(lblSubTotal)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel3)
-                .addGap(18, 18, 18)
-                .addComponent(lblTotal)
-                .addContainerGap())
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(lbltotalIva)
-                    .addComponent(jLabel2)
-                    .addComponent(lblSubTotal)
-                    .addComponent(jLabel3)
-                    .addComponent(lblTotal))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -261,13 +245,13 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tab)
+            .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tab))
+                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE))
         );
 
         pack();
@@ -327,22 +311,18 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JLabel lblSubTotal;
-    private javax.swing.JLabel lblTotal;
-    private javax.swing.JLabel lbltotalIva;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane tab;
     private javax.swing.JTable tablaClientes;
     private javax.swing.JTable tablaPedidos;
     private javax.swing.JTable tablaProductoPedido;
+    private javax.swing.JTable tablaTotales;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -376,15 +356,16 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
 
             Double totalIva = 0.0;
             Double subTotal = 0.0;
+            Double totalItems = 0.0;
             for (ProductoPedido pp : selectedPedido.getProductoPedidos()) {
+                totalItems += pp.getCantidad();
                 totalIva += pp.getSubTotalIva();
                 subTotal += pp.getSubTotal();
             }
 
-
-            lbltotalIva.setText(formatter.format(totalIva));
-            lblSubTotal.setText(formatter.format(subTotal));
-            lblTotal.setText(formatter.format(subTotal + totalIva));
+            
+            totalesTableModel.setRows(new Totales(totalItems, totalIva, subTotal + totalIva));
+            totalesTableModel.fireTableDataChanged();
         }
     }
 

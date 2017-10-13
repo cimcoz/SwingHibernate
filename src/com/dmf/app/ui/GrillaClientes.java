@@ -426,6 +426,18 @@ public class GrillaClientes extends javax.swing.JFrame implements ListSelectionL
                 case KeyEvent.VK_F2: 
                     System.out.println("Presionado f2, debo ver que fila esta seleccionada");
                     break;
+                case KeyEvent.VK_F3: 
+                    System.out.println("Presionado f3, lanzar la vista de agenda");
+//                    Cliente selected = clienteTableModel.getItem(row);
+                    JFrame f = new JFrame("Agregar Agenda");
+                    JDialog dialog = new JDialog(f);
+                    dialog.setContentPane(
+                            new AgendaView(clienteTableModel.getItem(row))
+                    );
+                    dialog.pack();
+                    dialog.setModal(true);
+                    dialog.setVisible(true);
+                    break;
                 case KeyEvent.VK_DOWN: 
                     System.out.println("Se presiono DOWN");
                     if (inicioTabla) {

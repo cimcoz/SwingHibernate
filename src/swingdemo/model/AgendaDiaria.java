@@ -14,6 +14,15 @@ import java.util.Date;
 public class AgendaDiaria {
     String hora;
     String cliente;
+    Boolean esLibre = true;
+
+    public void setEsLibre(Boolean esLibre) {
+        this.esLibre = esLibre;
+    }
+
+    public Boolean getEsLibre() {
+        return esLibre;
+    }
 
     public String getHora() {
         return hora;

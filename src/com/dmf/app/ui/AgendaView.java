@@ -9,10 +9,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.swing.DefaultComboBoxModel;
 import swingdemo.framework.EntityTableModel;
 import swingdemo.model.Agenda;
 import swingdemo.model.AgendaDiaria;
@@ -28,14 +30,19 @@ public class AgendaView extends javax.swing.JPanel {
     /**
      * Creates new form AgendaView
      */
-    
     EntityManager em;
     EntityTableModel<AgendaDiaria> tableModelAgendaDiaria;
     List<Agenda> listaAgenda;
     Agenda agenda;
     //Paciente seria en el caso de felix
     Cliente cliente;
-    
+    String FORMATO_HORA = "HH:mm";
+    String[] horariosLibres = new String[]{"08:00", "09:00", "10:00", "11:00",
+        "12:00", "14:00", "15:00", "16:00",
+        "17:00", "18:00"
+    };
+    List<String> horariosFiltrados;
+
     public AgendaView(Cliente cliente) {
         this.cliente = cliente;
         initComponents();
@@ -43,13 +50,13 @@ public class AgendaView extends javax.swing.JPanel {
         initTabla();
         initCampos();
 //        inicializar la fecha
-//        tfFechaConsulta.setDate(new Date());
+        tfFechaConsulta.setDate(new Date());
     }
-    
-    
-     private void initDatos() {
+
+    private void initDatos() {
         em = HibernateUtil.getEntityManagerFactory().createEntityManager();
         agenda = new Agenda();
+        horariosFiltrados = new ArrayList<>();
     }
 
     /**
@@ -179,7 +186,7 @@ public class AgendaView extends javax.swing.JPanel {
         agenda.setCliente(cliente);
         agenda.setFechaConsulta(tfFechaConsulta.getDate());
         //convertir el combo a Hora;
-        SimpleDateFormat formatoDeFecha = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat formatoDeFecha = new SimpleDateFormat(FORMATO_HORA);
         Date horaSeleccionada;
         try {
             horaSeleccionada = formatoDeFecha.parse(cbxHora.getSelectedItem().toString());
@@ -190,17 +197,20 @@ public class AgendaView extends javax.swing.JPanel {
         em.getTransaction().begin();
         em.persist(agenda);
         em.getTransaction().commit();
+        //Produce que se sincronicen los datos con la bbdd
+
         //Limpiar los datos
         agenda = new Agenda();
+        updateFecha();
+
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void tfFechaConsultaPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tfFechaConsultaPropertyChange
         // TODO add your handling code here:
-        System.out.println("Propiedad cambio: "+ evt.getPropertyName());
+        System.out.println("Propiedad cambio: " + evt.getPropertyName());
         if (evt.getPropertyName().equals("date")) {
-            //recargar la tabla de agenda!!!
-            tableModelAgendaDiaria.setRows(crearAgendaDiaria(getListaAgenda()));
-            tableModelAgendaDiaria.fireTableDataChanged();
+                //recargar la tabla de agenda!!!
+            updateFecha();
         }
     }//GEN-LAST:event_tfFechaConsultaPropertyChange
 
@@ -223,44 +233,56 @@ public class AgendaView extends javax.swing.JPanel {
 
     private void initTabla() {
         //Preparar la lista de agendas diarias
-        
-        
+
         tableModelAgendaDiaria = new EntityTableModel<>(AgendaDiaria.class, new ArrayList<AgendaDiaria>());
-        tableModelAgendaDiaria.addColumn("hora", "hora");
-        tableModelAgendaDiaria.addColumn("cliente", "cliente");
-        
+        tableModelAgendaDiaria.addColumn("Hora", "hora");
+        tableModelAgendaDiaria.addColumn("Paciente", "cliente");
         tablaAgendaDiaria.setModel(tableModelAgendaDiaria);
+
+        tablaAgendaDiaria.setDefaultRenderer(Object.class, new AgendaViewCellRenderer());
+
     }
-    
+
     private List<Agenda> getListaAgenda() {
-        return em.createQuery("From Agenda a Where a.fechaConsulta = :fecha")
+        return em.createQuery("From Agenda a Where a.fechaConsulta = :fecha ORDER BY a.hora")
                 .setParameter("fecha", tfFechaConsulta.getDate())
                 .getResultList();
     }
-    
-    private List<AgendaDiaria> crearAgendaDiaria(List<Agenda> agendas) {
+
+    /**
+     * Primero cargo todas las horas, luego las horas que si hay consultas
+     * remplazando las horas donde no hay consultas la lista retornada puede
+     * utilizarse para filtrar el combo
+     *
+     * @param agendas
+     * @return
+     * @throws ParseException
+     *
+     */
+    private List<AgendaDiaria> crearAgendaDiaria(List<Agenda> agendas) throws ParseException {
         List<AgendaDiaria> result = new ArrayList<>();
-        for (int i = 0 ; i < cbxHora.getItemCount() ;i++){
+        horariosFiltrados = new ArrayList<>();
+        //comparar con fechas
+        SimpleDateFormat format = new SimpleDateFormat(FORMATO_HORA);
+        Date horaCombo;
+        for (int i = 0; i < horariosLibres.length; i++) {
             AgendaDiaria ad = new AgendaDiaria();
-            for (Agenda a  : agendas){
-                if (cbxHora.getItemAt(i).equals(a.getHora().toString())) {
-                    ad.setCliente(a.getCliente().getNombre() +", " +a.getCliente().getApellido());
+            ad.setCliente("Libre");
+            ad.setHora(horariosLibres[i]);
+            horaCombo = format.parse(horariosLibres[i]);
+            for (Iterator<Agenda> it = agendas.iterator(); it.hasNext();) {
+                Agenda a = it.next();
+                if (horaCombo.equals(a.getHora())) {
+                    ad.setCliente(a.getCliente().getNombre() + ", " + a.getCliente().getApellido());
                     ad.setHora(a.getHora().toString());
-                    agendas.remove(a);
-                }
-                else {
-                    ad.setCliente("Libre");
-                    ad.setHora(cbxHora.getItemAt(i));
+                    ad.setEsLibre(Boolean.FALSE);
+                    it.remove();
+                    break;
                 }
             }
-            result.add(ad);
-            
-            
-        }
-        for (Agenda a  : agendas){
-            AgendaDiaria ad = new AgendaDiaria();
-            ad.setCliente(a.getCliente().getNombre() +", " +a.getCliente().getApellido());
-            ad.setHora(a.getHora().toString());
+            if (ad.getEsLibre()) {
+                horariosFiltrados.add(horariosLibres[i]);
+            }
             result.add(ad);
         }
         return result;
@@ -268,10 +290,26 @@ public class AgendaView extends javax.swing.JPanel {
 
     private void initCombo() {
         System.out.println("Crear los datos para las horas del combo");
-        
+
     }
 
     private void initCampos() {
-      tfPaciente.setText(cliente.getNombre()+ ", "+ cliente.getApellido());
+        tfPaciente.setText(cliente.getNombre() + ", " + cliente.getApellido());
     }
+
+    private void updateFecha() {
+
+        List<AgendaDiaria> agendaDiaria;
+        try {
+            agendaDiaria = crearAgendaDiaria(getListaAgenda());
+            cbxHora.setModel(new DefaultComboBoxModel<>(
+                    horariosFiltrados.toArray(new String[horariosFiltrados.size()])));
+            tableModelAgendaDiaria.setRows(agendaDiaria);
+            tableModelAgendaDiaria.fireTableDataChanged();
+        } catch (ParseException ex) {
+            Logger.getLogger(AgendaView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
 }
